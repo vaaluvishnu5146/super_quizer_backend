@@ -1,6 +1,10 @@
 const express = require("express");
 const parser = require("body-parser");
+const cors = require("cors");
 const http_server = express();
+
+// Enabling cors inside server
+http_server.use(cors());
 
 // Configure DOTENV
 require("dotenv").config();

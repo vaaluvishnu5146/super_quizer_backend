@@ -1,4 +1,5 @@
 const UserRouter = require("express").Router();
+var jwt = require("jsonwebtoken");
 const UserModel = require("./user.model");
 
 UserRouter.post("/create", (req, res) => {
@@ -29,12 +30,14 @@ UserRouter.post("/login", async (req, res) => {
 
   if (!email) {
     return res.status(400).json({
+      success: false,
       message: "Email is invalid",
     });
   }
 
   if (!password) {
     return res.status(400).json({
+      success: false,
       message: "Password is invalid",
     });
   }
@@ -48,11 +51,21 @@ UserRouter.post("/login", async (req, res) => {
   }
 
   if (matchingUser.password === password) {
+    var token = jwt.sign(
+      { userId: matchingUser._id, role: ["admin"] },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "1h",
+      }
+    );
     return res.status(200).json({
+      success: true,
+      token: token,
       message: "Login successful",
     });
   } else {
     return res.status(200).json({
+      success: true,
       error: "Wrong credentials",
       message: "Login failed",
     });

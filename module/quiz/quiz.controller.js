@@ -1,8 +1,10 @@
 const QuizRouter = require("express").Router();
+const { TokenChecker } = require("../Middleware/Authentication.middleware.js");
+const { QuizManagingSheild } = require("../Middleware/Quiz.middleware.js");
 // Importing models
 const QuizModel = require("./Quiz.model.js");
 
-QuizRouter.get("/", (req, res, next) => {
+QuizRouter.get("/", TokenChecker, (req, res, next) => {
   QuizModel.find()
     .then((response) => {
       res.status(200).json({
@@ -15,7 +17,7 @@ QuizRouter.get("/", (req, res, next) => {
     .catch((error) => console.log(error));
 });
 
-QuizRouter.get("/:quizId", (req, res, next) => {
+QuizRouter.get("/:quizId", TokenChecker, (req, res, next) => {
   const { quizId } = req.params;
   QuizModel.findOne({ _id: quizId })
     .then((response) => {
@@ -32,7 +34,7 @@ QuizRouter.get("/:quizId", (req, res, next) => {
     });
 });
 
-QuizRouter.post("/create", async (req, res, next) => {
+QuizRouter.post("/create", QuizManagingSheild, async (req, res, next) => {
   const Quiz = new QuizModel(req.body);
   Quiz.save()
     .then((response) => {
